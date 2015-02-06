@@ -1,0 +1,25 @@
+---
+- name: Install PostgreSQL DBMS
+  apt: pkg={{ item }} state=installed
+  with_items: "postgres_requirements"
+
+- name: Create database user
+  sudo: yes
+  sudo_user: postgres
+  postgresql_user: user={{ postgres_user }} password={{ postgres_password }} 
+                   role_attr_flags=CREATEDB
+
+- name: Ensure user database is created
+  sudo: yes
+  sudo_user: postgres
+  postgresql_db: name={{ postgres_user }} owner={{ postgres_user }} 
+                 encoding='UTF-8'
+
+- name: configure PostgreSQL authentication
+  lineinfile: dest=/etc/postgresql/{{ postgres_version }}/main/pg_hba.conf
+              regexp="^local\s+all\s+all\s+\s+peer$"
+              line="local   all             all                                     md5"
+              state=present insertafter=regex
+
+- name: ensure PostgreSQL is running
+  service: name=postgresql state=started

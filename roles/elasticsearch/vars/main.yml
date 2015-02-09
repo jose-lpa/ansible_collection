@@ -1,0 +1,6 @@
+---
+system_dependencies:
+  - software-properties-common
+  - python3-software-properties
+  - python-apt
+  - python-apt-common
